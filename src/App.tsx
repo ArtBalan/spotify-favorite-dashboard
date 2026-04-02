@@ -1,0 +1,28 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout";
+
+import OverviewPage from "./pages/OverviewPage";
+import ArtistsPage from "./pages/ArtistsPage";
+import GenresPage from "./pages/GenresPage";
+import PopularityPage from "./pages/PopularityPage";
+import DurationPage from "./pages/DurationPage";
+import YearsPage from "./pages/YearsPage";
+import PerYearsPage from "./pages/PerYearsPage";
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<OverviewPage />} />
+          <Route path="/artists" element={<ArtistsPage />} />
+          <Route path="/genres" element={<GenresPage />} />
+          <Route path="/popularity" element={<PopularityPage />} />
+          <Route path="/duration" element={<DurationPage />} />
+          <Route path="/years" element={<YearsPage />} />
+          <Route path="/perYears" element={<PerYearsPage/>} />
+        </Routes>
+      </Layout>
+    </BrowserRouter>
+  );
+}
