@@ -3,16 +3,63 @@ import SongsTable from "../components/SongsTable";
 import { getTopYears } from "../lib/analytics";
 import { loadTracks } from "../lib/parseCsv";
 
+type SortKey = "rank" | "year" | "count" | "share";
+
+function SortIcon({ active, dir }: { active: boolean; dir: "asc" | "desc" }) {
+  return (
+    <span className={`ml-1.5 inline-flex flex-col gap-[2px] transition-opacity ${active ? "opacity-100" : "opacity-30"}`}>
+      <svg width="8" height="5" viewBox="0 0 8 5" className={`transition-colors ${active && dir === "asc" ? "text-emerald-400" : "text-slate-500"}`}>
+        <path d="M4 0L8 5H0L4 0Z" fill="currentColor" />
+      </svg>
+      <svg width="8" height="5" viewBox="0 0 8 5" className={`transition-colors ${active && dir === "desc" ? "text-emerald-400" : "text-slate-500"}`}>
+        <path d="M4 5L0 0H8L4 5Z" fill="currentColor" />
+      </svg>
+    </span>
+  );
+}
+
 export default function PerYearsPage() {
   const tracks = loadTracks();
   const years = getTopYears(tracks);
   const total = tracks.length;
 
   const [selectedYear, setSelectedYear] = useState(years[0]?.year || "");
+  const [sortKey, setSortKey] = useState<SortKey>("rank");
+  const [direction, setDirection] = useState<"asc" | "desc">("asc");
+
+  function sortBy(key: SortKey) {
+    if (sortKey === key) {
+      setDirection(direction === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(key);
+      setDirection(key === "rank" ? "asc" : "desc");
+    }
+  }
+
+  const sortedYears = useMemo(() => {
+    const modifier = direction === "asc" ? 1 : -1;
+    return [...years].map((y, i) => ({ ...y, rank: i + 1 })).sort((a, b) => {
+      if (sortKey === "year") return a.year.localeCompare(b.year) * modifier;
+      if (sortKey === "share") return (a.count - b.count) * modifier;
+      return (a[sortKey] - b[sortKey]) * modifier;
+    });
+  }, [years, sortKey, direction]);
 
   const yearTrack = useMemo(
     () => tracks.filter((t) => t.releaseDate.split("-")[0] === selectedYear),
     [tracks, selectedYear]
+  );
+
+  const col = (key: SortKey, label: string) => (
+    <th
+      className="cursor-pointer p-4 select-none whitespace-nowrap group"
+      onClick={() => sortBy(key)}
+    >
+      <span className="inline-flex items-center gap-0.5 transition-colors group-hover:text-slate-200">
+        {label}
+        <SortIcon active={sortKey === key} dir={direction} />
+      </span>
+    </th>
   );
 
   return (
@@ -24,15 +71,15 @@ export default function PerYearsPage() {
           <table className="w-full text-left text-sm">
             <thead className="bg-slate-950 text-slate-400">
               <tr>
-                <th className="p-4 text-slate-600">#</th>
-                <th className="p-4">Year</th>
-                <th className="p-4">Songs</th>
-                <th className="p-4">Share</th>
+                {col("rank", "#")}
+                {col("year", "Year")}
+                {col("count", "Songs")}
+                {col("share", "Share")}
               </tr>
             </thead>
 
             <tbody>
-              {years.map((year, i) => {
+              {sortedYears.map((year) => {
                 const share = (year.count / total) * 100;
                 return (
                   <tr
@@ -42,7 +89,7 @@ export default function PerYearsPage() {
                       selectedYear === year.year ? "bg-slate-800" : ""
                     }`}
                   >
-                    <td className="p-4 text-slate-500 tabular-nums">{i + 1}</td>
+                    <td className="p-4 text-slate-500 tabular-nums">{year.rank}</td>
                     <td className="p-4 font-medium">{year.year}</td>
                     <td className="p-4">{year.count}</td>
                     <td className="p-4">
