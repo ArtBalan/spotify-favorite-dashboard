@@ -9,16 +9,23 @@ export function loadTracks(): Track[] {
 
   const rows = result.data.slice(1);
 
-  return rows.map((r) => ({
+  return rows.map((r: any) => ({
     genre: r[0] || "Unknown",
     allGenres: (r[1] || "").split(" | "),
     genreSource: r[2] || "",
     title: r[3] || "",
     artist: r[4] || "",
-    album: r[5] || "",
-    releaseDate: r[6] || "",
-    duration: r[7] || "",
-    popularity: Number(r[8]) || 0,
-    explicit: r[9] === "Yes",
+    artistURL: r[5] || "",
+    album: r[6] || "",
+    albumURL: r[7] || "",
+    releaseDate: r[8] || "",
+    duration: r[9] || "",
+    popularity: Number(r[10]) || 0,
+    explicit: r[11] === "Yes",
+    trackNbr: Number(r[12]) || 0,
+    ISRC: r[13] || "",
+    addedAt: r[14] || "",
+    spotifyURL: r[15] || "",
+    previewURL: r[16] || "",
   }));
 }

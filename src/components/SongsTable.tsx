@@ -24,7 +24,8 @@ export default function SongsTable({ tracks }: { tracks: Track[] }) {
             >
               <td className="px-4 py-3">
   <a
-    href={track.spotifyUrl}
+    
+    href={track.spotifyURL}
     target="_blank"
     rel="noreferrer"
     className="font-medium text-emerald-400 transition hover:text-emerald-300 hover:underline"
@@ -34,7 +35,7 @@ export default function SongsTable({ tracks }: { tracks: Track[] }) {
 </td>
               <td className="px-4 py-3">
   <a
-    href={`https://open.spotify.com/search/${encodeURIComponent(track.album)}`}
+    href={track.albumURL}
     target="_blank"
     rel="noreferrer"
     className="text-slate-300 transition hover:text-white hover:underline"
@@ -42,7 +43,14 @@ export default function SongsTable({ tracks }: { tracks: Track[] }) {
     {track.album}
   </a>
 </td>
-              <td className="p-4">{track.artist}</td>
+              <td className="p-4">
+                <a
+    href={track.artistURL}
+    target="_blank"
+    rel="noreferrer"
+    className="text-slate-300 transition hover:text-white hover:underline"
+  >{track.artist}
+  </a></td>
               <td className="p-4 text-slate-400">{track.releaseDate}</td>
               <td className="p-4">{track.popularity}</td>
               <td className="p-4">{track.duration}</td>

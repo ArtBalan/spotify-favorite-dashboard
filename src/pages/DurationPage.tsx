@@ -93,7 +93,15 @@ const shortestSong = [...validTracks].sort(
 
   {shortestSong ? (
     <>
-      <div className="mt-2 text-xl font-bold">{shortestSong.title}</div>
+      <div className="mt-2 text-xl font-bold">
+        <a 
+          target="_blank"
+          rel="noreferrer"
+          className="font-medium text-emerald-400 transition hover:text-emerald-300 hover:underline"
+          href={shortestSong.spotifyURL}>
+            {shortestSong.title}
+          </a>
+        </div>
       <div className="mt-1 text-slate-400">
         {shortestSong.artist} • {shortestSong.duration}
       </div>
@@ -105,7 +113,15 @@ const shortestSong = [...validTracks].sort(
 
         <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
           <div className="text-slate-400">Longest Song</div>
-          <div className="mt-2 text-xl font-bold">{longestSong.title}</div>
+          <div className="mt-2 text-xl font-bold">
+            <a 
+          target="_blank"
+          rel="noreferrer"
+          className="font-medium text-emerald-400 transition hover:text-emerald-300 hover:underline"
+          href={longestSong.spotifyURL}>
+            {longestSong.title}
+            </a>
+          </div>
           <div className="mt-1 text-slate-400">
             {longestSong.artist} • {longestSong.duration}
           </div>
