@@ -49,7 +49,9 @@ export function getTopYears(tracks: Track[]){
 
   return [...counts.entries()]
     .map(([year, count]) => ({ year, count }))
-    .sort((a, b) => b.count - a.count || parseInt(b.year) - parseInt(a.year));
+    .sort((a, b) => b.count - a.count || parseInt(b.year) - parseInt(a.year))
+    .sort((a, b) => b.count - a.count)
+    .map((g, index) => ({ ...g, rank: index + 1 }));;
 }
 
 export function getGenres(tracks: Track[]) {
@@ -78,9 +80,12 @@ export function getGenres(tracks: Track[]) {
     map.set(track.genre, current);
   });
 
-  return [...map.values()].map((g) => ({
-    ...g,
-    avgPopularity: g.avgPopularity / g.count,
-    explicitRate: (g.explicitRate / g.count) * 100,
-  }));
+  return [...map.values()]
+    .map((g) => ({
+      ...g,
+      avgPopularity: g.avgPopularity / g.count,
+      explicitRate: (g.explicitRate / g.count) * 100,
+    }))
+    .sort((a, b) => b.count - a.count)
+    .map((g, index) => ({ ...g, rank: index + 1 }));
 }

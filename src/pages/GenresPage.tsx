@@ -79,7 +79,7 @@ export default function GenresPage() {
             </thead>
 
             <tbody>
-              {sortedGenres.map((genre,index) => {
+              {sortedGenres.map((genre) => {
                 const share = (genre.count / total) * 100;
                 return (
                   <tr
@@ -89,7 +89,7 @@ export default function GenresPage() {
                       selectedGenre === genre.genre ? "bg-slate-800" : ""
                     }`}
                   >
-                    <td className="p-4 text-slate-500 tabular-nums">{index + 1}</td>
+                    <td className="p-4 text-slate-500 tabular-nums">{genre.rank}</td>
                     <td className="p-4">{genre.genre}</td>
                     <td className="p-4">{genre.count}</td>
                     <td className="p-4">

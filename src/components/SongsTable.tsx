@@ -12,6 +12,7 @@ export default function SongsTable({ tracks }: { tracks: Track[] }) {
             <th className="p-4">Release</th>
             <th className="p-4">Popularity</th>
             <th className="p-4">Duration</th>
+            <th className="p-4">Explicit</th>
           </tr>
         </thead>
 
@@ -45,6 +46,7 @@ export default function SongsTable({ tracks }: { tracks: Track[] }) {
               <td className="p-4 text-slate-400">{track.releaseDate}</td>
               <td className="p-4">{track.popularity}</td>
               <td className="p-4">{track.duration}</td>
+              <td className="p-4">{track.explicit ? "🔞" : "—"}</td>
             </tr>
           ))}
         </tbody>
