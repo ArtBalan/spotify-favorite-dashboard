@@ -8,8 +8,12 @@ import PopularityPage from "./pages/PopularityPage";
 import DurationPage from "./pages/DurationPage";
 import YearsPage from "./pages/YearsPage";
 import PerYearsPage from "./pages/PerYearsPage";
-
+import { hasData } from "./lib/parseCsv";
+import MissingData from "./components/MissingData";
 export default function App() {
+
+
+  if (!hasData()) return <MissingData />;
   return (
     <BrowserRouter>
       <Layout>

@@ -1,6 +1,17 @@
 import Papa from "papaparse";
-import csvFile from "../data/liked_songs_by_genre.csv?raw";
 import type { Track } from "../types";
+
+// src/lib/parseCsv.ts
+const modules = import.meta.glob("../data/liked_songs_by_genre.csv", {
+  query: "?raw",
+  eager: true,
+}) as Record<string, { default: string }>;
+
+const csvFile = modules["../data/liked_songs_by_genre.csv"]?.default ?? "";
+
+export function hasData(): boolean {
+  return csvFile.trim().length > 0;
+}
 
 export function loadTracks(): Track[] {
   const result = Papa.parse<string[]>(csvFile, {

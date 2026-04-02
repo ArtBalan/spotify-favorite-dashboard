@@ -65,21 +65,19 @@ export default function ArtistsPage() {
     <div>
       <h1 className="mb-6 text-4xl font-bold">Artists</h1>
 
-     <div className="grid gap-6 lg:grid-cols-[580px_1fr]">
+      <div className="grid gap-6 lg:grid-cols-[435px_1fr]">
         <div className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900">
-          <table className="w-full text-left text-sm">
+          <table className=" text-left text-sm">
             <thead className="bg-slate-950 text-slate-400">
               <tr>
                 {col("rank", "#")}
                 {col("artist", "Artist")}
                 {col("count", "Songs")}
-                <th className="p-4">Share</th>
               </tr>
             </thead>
 
             <tbody>
               {sortedArtists.map((artist) => {
-                const share = (artist.count / total) * 100;
                 return (
                   <tr
                     key={artist.artist}
@@ -91,17 +89,6 @@ export default function ArtistsPage() {
                     <td className="p-4 text-slate-500 tabular-nums">{artist.rank}</td>
                     <td className="p-4 font-medium">{artist.artist}</td>
                     <td className="p-4">{artist.count}</td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-2">
-                        <div className="h-1.5 w-20 overflow-hidden rounded-full bg-slate-700">
-                          <div
-                            className="h-full rounded-full bg-emerald-500"
-                            style={{ width: `${share}%` }}
-                          />
-                        </div>
-                        <span className="text-slate-400">{share.toFixed(1)}%</span>
-                      </div>
-                    </td>
                   </tr>
                 );
               })}
