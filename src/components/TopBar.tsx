@@ -8,6 +8,7 @@ const links = [
   ["/duration", "Duration"],
   ["/years", "Years"],
   ["/perYears", "Per Years"],
+  ["/activity", "Activity"],
 ];
 
 export default function Topbar() {

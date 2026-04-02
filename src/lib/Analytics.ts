@@ -5,6 +5,93 @@ export function parseDuration(duration: string) {
   return m * 60 + s;
 }
 
+export function getLongestStreak(tracks: Track[], unit: "day" | "week"): {
+  streak: number;
+  from: string;
+  to: string;
+} {
+  const dates = [...new Set(
+    tracks
+      .filter((t) => t.addedAt)
+      .map((t) => {
+        const [datePart] = t.addedAt.split("T");
+        if (unit === "day") return datePart;
+        // ISO week key: "2023-W14"
+        const [year, month, day] = datePart.split("-").map(Number);
+        const d = new Date(year, month - 1, day);
+        const dayOfWeek = d.getDay() === 0 ? 7 : d.getDay();
+        const monday = new Date(d);
+        monday.setDate(d.getDate() - (dayOfWeek - 1));
+        return monday.toISOString().slice(0, 10);
+      })
+  )].sort();
+
+  if (dates.length === 0) return { streak: 0, from: "", to: "" };
+
+  let best = 1, bestStart = 0, bestEnd = 0;
+  let current = 1, currentStart = 0;
+
+  const msPerUnit = unit === "day" ? 86400_000 : 7 * 86400_000;
+
+  for (let i = 1; i < dates.length; i++) {
+    const prev = new Date(dates[i - 1]).getTime();
+    const curr = new Date(dates[i]).getTime();
+    if (curr - prev === msPerUnit) {
+      current++;
+      if (current > best) {
+        best = current;
+        bestStart = currentStart;
+        bestEnd = i;
+      }
+    } else {
+      current = 1;
+      currentStart = i;
+    }
+  }
+
+  return { streak: best, from: dates[bestStart], to: dates[bestEnd] };
+}
+
+export function getCurrentStreak(tracks: Track[], unit: "day" | "week"): {
+  streak: number;
+  from: string;
+} {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const toUnitKey = (datePart: string): string => {
+    if (unit === "day") return datePart;
+    const [year, month, day] = datePart.split("-").map(Number);
+    const d = new Date(year, month - 1, day);
+    const dayOfWeek = d.getDay() === 0 ? 7 : d.getDay();
+    const monday = new Date(d);
+    monday.setDate(d.getDate() - (dayOfWeek - 1));
+    return monday.toISOString().slice(0, 10);
+  };
+
+  const todayKey = toUnitKey(today.toISOString().slice(0, 10));
+
+  const dates = [...new Set(
+    tracks
+      .filter((t) => t.addedAt)
+      .map((t) => toUnitKey(t.addedAt.split("T")[0]))
+  )].sort().reverse(); // most recent first
+
+  if (dates.length === 0 || dates[0] !== todayKey) return { streak: 0, from: "" };
+
+  const msPerUnit = unit === "day" ? 86400_000 : 7 * 86400_000;
+  let streak = 1;
+
+  for (let i = 1; i < dates.length; i++) {
+    const prev = new Date(dates[i - 1]).getTime();
+    const curr = new Date(dates[i]).getTime();
+    if (prev - curr === msPerUnit) streak++;
+    else break;
+  }
+
+  return { streak, from: dates[streak - 1] };
+}
+
 export function getOverviewStats(tracks: Track[]) {
   const totalSongs = tracks.length;
   const uniqueArtists = new Set(tracks.map((t) => t.artist)).size;

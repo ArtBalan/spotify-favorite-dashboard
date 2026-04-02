@@ -72,6 +72,7 @@ npx ts-node src/scripts/fetchSpotify.ts
 ```
 
 This script uses your Spotify credentials to fetch the data required by the dashboard.
+A authentification link will be prompted, clic on it to allow the api to work properly.
 
 ---
 
