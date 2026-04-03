@@ -56,12 +56,12 @@ export default function DurationPage() {
     .reduce((a, b) => a + b, 0);
 
   const averageMinutes = (totalSeconds / tracks.length / 60).toFixed(2);
-const validTracks = tracks.filter(
-  (t) => t.title && t.duration && t.duration.includes(":")
-);
-const shortestSong = [...validTracks].sort(
-  (a, b) => parseDuration(a.duration) - parseDuration(b.duration)
-)[0];
+  const validTracks = tracks.filter(
+    (t) => t.title && t.duration && t.duration.includes(":")
+  );
+  const shortestSong = [...validTracks].sort(
+    (a, b) => parseDuration(a.duration) - parseDuration(b.duration)
+  )[0];
 
   const longestSong = [...tracks].sort(
     (a, b) => parseDuration(b.duration) - parseDuration(a.duration)
@@ -89,37 +89,37 @@ const shortestSong = [...validTracks].sort(
           </div>
         </div>
         <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
-  <div className="text-slate-400">Shortest Song</div>
+          <div className="text-slate-400">Shortest Song</div>
 
-  {shortestSong ? (
-    <>
-      <div className="mt-2 text-xl font-bold">
-        <a 
-          target="_blank"
-          rel="noreferrer"
-          className="font-medium text-emerald-400 transition hover:text-emerald-300 hover:underline"
-          href={shortestSong.spotifyURL}>
-            {shortestSong.title}
-          </a>
+          {shortestSong ? (
+            <>
+              <div className="mt-2 text-xl font-bold">
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-medium text-emerald-400 transition hover:text-emerald-300 hover:underline"
+                  href={shortestSong.spotifyURL}>
+                  {shortestSong.title}
+                </a>
+              </div>
+              <div className="mt-1 text-slate-400">
+                {shortestSong.artist} • {shortestSong.duration}
+              </div>
+            </>
+          ) : (
+            <div className="mt-2 text-slate-500">No song found</div>
+          )}
         </div>
-      <div className="mt-1 text-slate-400">
-        {shortestSong.artist} • {shortestSong.duration}
-      </div>
-    </>
-  ) : (
-    <div className="mt-2 text-slate-500">No song found</div>
-  )}
-</div>
 
         <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
           <div className="text-slate-400">Longest Song</div>
           <div className="mt-2 text-xl font-bold">
-            <a 
-          target="_blank"
-          rel="noreferrer"
-          className="font-medium text-emerald-400 transition hover:text-emerald-300 hover:underline"
-          href={longestSong.spotifyURL}>
-            {longestSong.title}
+            <a
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium text-emerald-400 transition hover:text-emerald-300 hover:underline"
+              href={longestSong.spotifyURL}>
+              {longestSong.title}
             </a>
           </div>
           <div className="mt-1 text-slate-400">
@@ -136,7 +136,11 @@ const shortestSong = [...validTracks].sort(
             <BarChart data={durationBuckets}>
               <XAxis dataKey="name" stroke="#94a3b8" />
               <YAxis stroke="#94a3b8" />
-              <Tooltip />
+              <Tooltip
+                contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #1e293b", borderRadius: "12px", fontSize: "12px" }}
+                labelStyle={{ color: "#e2e8f0" }}
+                itemStyle={{ color: "#e2e8f0" }}
+              />
               <Bar dataKey="value" fill="#10b981" radius={[12, 12, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>

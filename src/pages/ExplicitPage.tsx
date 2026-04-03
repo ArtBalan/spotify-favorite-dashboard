@@ -76,10 +76,11 @@ export default function ExplicitPage() {
     [explicitTracks]
   );
 
-  const tooltipStyle = {
-    contentStyle: { backgroundColor: "#0f172a", border: "1px solid #1e293b", borderRadius: "12px", fontSize: "12px" },
-    labelStyle: { color: "#e2e8f0" },
-  };
+const tooltipStyle = {
+  contentStyle: { backgroundColor: "#0f172a", border: "1px solid #1e293b", borderRadius: "12px", fontSize: "12px" },
+  labelStyle: { color: "#e2e8f0" },
+  itemStyle: { color: "#e2e8f0" },
+};
 
   return (
     <div className="space-y-6">

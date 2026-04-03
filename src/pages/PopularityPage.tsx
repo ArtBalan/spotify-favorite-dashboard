@@ -5,14 +5,14 @@ export default function PopularityPage() {
   const tracks = loadTracks();
 
   const buckets = [
-    { name: "Hits",    value: tracks.filter((t) => t.popularity >= 80).length },
+    { name: "Hits", value: tracks.filter((t) => t.popularity >= 80).length },
     { name: "Popular", value: tracks.filter((t) => t.popularity >= 60 && t.popularity < 80).length },
-    { name: "Mid",     value: tracks.filter((t) => t.popularity >= 40 && t.popularity < 60).length },
-    { name: "Niche",   value: tracks.filter((t) => t.popularity < 40).length },
+    { name: "Mid", value: tracks.filter((t) => t.popularity >= 40 && t.popularity < 60).length },
+    { name: "Niche", value: tracks.filter((t) => t.popularity < 40).length },
   ];
 
   const sorted = [...tracks].sort((a, b) => b.popularity - a.popularity);
-  const top10    = sorted.slice(0, 10);
+  const top10 = sorted.slice(0, 10);
   const bottom10 = sorted.slice(-10).reverse();
 
   const TrackList = ({ items, color }: { items: typeof tracks; color: string }) => (
@@ -44,7 +44,7 @@ export default function PopularityPage() {
       ))}
     </div>
   );
-
+  const total = tracks.length;
   return (
     <div className="space-y-6">
       <div>
@@ -62,8 +62,18 @@ export default function PopularityPage() {
               <XAxis dataKey="name" stroke="#94a3b8" />
               <YAxis stroke="#94a3b8" />
               <Tooltip
-                contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #1e293b", borderRadius: "12px" }}
+                contentStyle={{
+                  backgroundColor: "#0f172a",
+                  border: "1px solid #1e293b",
+                  borderRadius: "12px",
+                  color: "#e2e8f0",
+                }}
                 labelStyle={{ color: "#e2e8f0" }}
+                itemStyle={{ color: "#e2e8f0" }}
+                formatter={(value: number) => [
+                  `${value} (${((value / total) * 100).toFixed(1)}%)`,
+                  "Count"
+                ]}
               />
               <Bar dataKey="value" radius={[12, 12, 0, 0]}>
                 {buckets.map((_, index) => (

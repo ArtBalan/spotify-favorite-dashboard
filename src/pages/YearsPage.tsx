@@ -91,7 +91,11 @@ export default function YearsPage() {
                 tick={{ fontSize: 12 }}
               />
               <YAxis stroke="#94a3b8" />
-              <Tooltip />
+              <Tooltip
+                contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #1e293b", borderRadius: "12px", fontSize: "12px" }}
+                labelStyle={{ color: "#e2e8f0" }}
+                itemStyle={{ color: "#e2e8f0" }}
+              />
               <Bar
                 dataKey="count"
                 fill="#8b5cf6"

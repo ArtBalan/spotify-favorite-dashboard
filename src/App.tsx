@@ -13,6 +13,7 @@ import MissingData from "./components/MissingData";
 import ActivityPage from "./pages/ActivityPage";
 import AlbumsPage from "./pages/AlbumPage";
 import ExplicitPage from "./pages/ExplicitPage";
+import DiscoveryPage from "./pages/DiscoveryPage";
 export default function App() {
 
 
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="/activity" element={<ActivityPage />} />
           <Route path="/albums" element={<AlbumsPage />} />
           <Route path="/explicit" element={<ExplicitPage />} />
+          <Route path="/discovery" element={<DiscoveryPage />} />
         </Routes>
       </Layout>
     </BrowserRouter>

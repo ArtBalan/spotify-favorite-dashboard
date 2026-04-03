@@ -11,9 +11,9 @@ export default function OverviewPage() {
 
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-5">
         <StatCard title="Songs" value={stats.totalSongs} />
-        <StatCard title="Artists" value={stats.uniqueArtists} />
-        <StatCard title="Avg Popularity" value={stats.avgPopularity} />
-        <StatCard title="Explicit Songs" value={stats.explicitCount} />
+        <StatCard title="Artists" value={stats.uniqueArtists + " ("+(stats.totalSongs/stats.uniqueArtists).toFixed(2)+ " Songs per artists)"} />
+        <StatCard title="Avg Popularity" value={stats.avgPopularity+"/100"} />
+        <StatCard title="Explicit Songs" value={stats.explicitCount + " (" + (stats.explicitCount/stats.totalSongs*100).toFixed(2) + "%)"} />
         <StatCard title="Total Hours" value={stats.totalHours} />
       </div>
     </div>
