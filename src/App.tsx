@@ -11,6 +11,8 @@ import PerYearsPage from "./pages/PerYearsPage";
 import { hasData } from "./lib/parseCsv";
 import MissingData from "./components/MissingData";
 import ActivityPage from "./pages/ActivityPage";
+import AlbumsPage from "./pages/AlbumPage";
+import ExplicitPage from "./pages/ExplicitPage";
 export default function App() {
 
 
@@ -27,6 +29,8 @@ export default function App() {
           <Route path="/years" element={<YearsPage />} />
           <Route path="/perYears" element={<PerYearsPage/>} />
           <Route path="/activity" element={<ActivityPage />} />
+          <Route path="/albums" element={<AlbumsPage />} />
+          <Route path="/explicit" element={<ExplicitPage />} />
         </Routes>
       </Layout>
     </BrowserRouter>
