@@ -21,7 +21,6 @@ function SortIcon({ active, dir }: { active: boolean; dir: "asc" | "desc" }) {
 export default function ArtistsPage() {
   const tracks = loadTracks();
   const artists = getTopArtists(tracks);
-  const total = tracks.length;
 
   const [selectedArtist, setSelectedArtist] = useState(artists[0]?.artist || "");
   const [sortKey, setSortKey] = useState<SortKey>("rank");

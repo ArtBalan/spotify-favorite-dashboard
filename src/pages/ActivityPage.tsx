@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { loadTracks } from "../lib/parseCsv";
 import {
   AreaChart,
@@ -8,13 +8,27 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
 import { getCurrentStreak, getLongestStreak } from "../lib/Analytics";
 import type { Track } from "../types";
 
 type Granularity = "day" | "month" | "year";
 
+const GENRE_COLORS = ["#10b981", "#3b82f6", "#f59e0b"];
+
 function Modal({ date, tracks, onClose }: { date: string; tracks: Track[]; onClose: () => void }) {
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
   const genreCounts = useMemo(() => {
     const counts = new Map<string, number>();
     for (const t of tracks) {
@@ -29,10 +43,9 @@ function Modal({ date, tracks, onClose }: { date: string; tracks: Track[]; onClo
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-3xl border border-slate-700 bg-slate-900 shadow-2xl"
+        className="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-slate-700 bg-slate-900 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4">
           <div>
             <div className="font-semibold text-white">{date}</div>
@@ -46,52 +59,33 @@ function Modal({ date, tracks, onClose }: { date: string; tracks: Track[]; onClo
           </button>
         </div>
 
-        <div className="grid grid-cols-[1fr_180px] h-[60vh] ">
-          {/* Track list */}
+        <div className="grid grid-cols-[1fr_180px] h-[60vh]">
           <div className="overflow-y-auto border-r border-slate-800">
             {tracks.length === 0 ? (
               <div className="px-6 py-8 text-center text-slate-500 text-sm">No songs added on this date.</div>
             ) : (
               tracks.map((t, i) => (
-                <div
-                  key={`${t.artist}-${t.title}-${i}`}
-                  className="flex items-center gap-3 border-t border-slate-800 px-4 py-3"
-                >
+                <div key={`${t.artist}-${t.title}-${i}`} className="flex items-center gap-3 border-t border-slate-800 px-4 py-3">
                   <span className="w-5 shrink-0 text-right text-xs tabular-nums text-slate-500">{i + 1}</span>
                   <div className="min-w-0 flex-1">
-                    <a
-                      href={t.spotifyURL}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="truncate block font-medium text-emerald-400 transition hover:text-emerald-300 hover:underline"
-                    >
+                    <a href={t.spotifyURL} target="_blank" rel="noreferrer" className="truncate block font-medium text-emerald-400 transition hover:text-emerald-300 hover:underline">
                       {t.title}
                     </a>
                     <div className="truncate text-xs text-slate-400">{t.artist}</div>
                     <div className="truncate text-xs text-slate-500">{t.genre}</div>
                   </div>
-                  <span className="shrink-0 rounded-full bg-slate-800 px-2 py-0.5 text-xs text-slate-400">
-                    {t.popularity}
-                  </span>
+                  <span className="shrink-0 rounded-full bg-slate-800 px-2 py-0.5 text-xs text-slate-400">{t.popularity}</span>
                 </div>
               ))
             )}
           </div>
 
-          {/* Genre counts */}
           <div className="overflow-y-auto">
-            <div className="sticky top-0 bg-slate-900 px-4 py-3 text-xs font-semibold text-slate-400 border-b border-slate-800">
-              Genres
-            </div>
+            <div className="sticky top-0 bg-slate-900 px-4 py-3 text-xs font-semibold text-slate-400 border-b border-slate-800">Genres</div>
             {genreCounts.map(([genre, count]) => (
-              <div
-                key={genre}
-                className="flex items-center justify-between border-t border-slate-800 px-4 py-2 gap-2"
-              >
+              <div key={genre} className="flex items-center justify-between border-t border-slate-800 px-4 py-2 gap-2">
                 <span className="truncate text-xs text-slate-300">{genre}</span>
-                <span className="shrink-0 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-400">
-                  {count}
-                </span>
+                <span className="shrink-0 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-400">{count}</span>
               </div>
             ))}
           </div>
@@ -121,10 +115,18 @@ export default function ActivityPage() {
 
   function getKeyFromInput(input: string): string {
     if (!input) return "";
-    if (granularity === "year") return input;
-    if (granularity === "month") return input; // already "YYYY-MM"
-    return input; // already "YYYY-MM-DD"
+    return input;
   }
+
+  // Find top 3 genres overall
+  const top3Genres = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const t of tracks) counts.set(t.genre, (counts.get(t.genre) ?? 0) + 1);
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([genre]) => genre);
+  }, [tracks]);
 
   const tracksByKey = useMemo(() => {
     const map = new Map<string, Track[]>();
@@ -141,21 +143,25 @@ export default function ActivityPage() {
   const data = useMemo(() =>
     [...tracksByKey.entries()]
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([date, t]) => ({ date, count: t.length })),
-    [tracksByKey]
+      .map(([date, t]) => ({
+        date,
+        count: t.length,
+        ...Object.fromEntries(
+          top3Genres.map((genre) => [genre, t.filter((track) => track.genre === genre).length])
+        ),
+      })),
+    [tracksByKey, top3Genres]
   );
 
   const total = tracks.filter((t) => t.addedAt).length;
   const peak = data.reduce((a, b) => (b.count > a.count ? b : a), { date: "", count: 0 });
   const avg = Math.round(total / (data.length || 1));
-
   const modalTracks = selectedDate ? (tracksByKey.get(selectedDate) ?? []) : [];
 
   return (
     <div>
       <h1 className="mb-6 text-4xl font-bold">Listening Activity 📅</h1>
 
-      {/* Stats */}
       <div className="mb-6 grid grid-cols-3 gap-4">
         {[
           { label: "Total liked", value: total },
@@ -173,7 +179,6 @@ export default function ActivityPage() {
         ))}
       </div>
 
-      {/* Chart */}
       <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
         <div className="mb-4 flex items-center justify-between gap-4">
           <span className="font-medium">
@@ -182,7 +187,6 @@ export default function ActivityPage() {
           </span>
 
           <div className="flex items-center gap-2">
-            {/* Manual date picker */}
             <div className="flex items-center gap-1">
               <input
                 type={granularity === "year" ? "number" : granularity === "month" ? "month" : "date"}
@@ -204,15 +208,13 @@ export default function ActivityPage() {
               )}
             </div>
 
-            {/* Granularity switcher */}
             <div className="flex gap-1 rounded-xl bg-slate-800 p-1 text-xs">
               {(["day", "month", "year"] as Granularity[]).map((g) => (
                 <button
                   key={g}
                   onClick={() => { setGranularity(g); setFilterDate(""); setSelectedDate(null); }}
-                  className={`rounded-lg px-3 py-1 transition capitalize ${
-                    granularity === g ? "bg-emerald-500 text-black font-medium" : "text-slate-400 hover:text-white"
-                  }`}
+                  className={`rounded-lg px-3 py-1 transition capitalize ${granularity === g ? "bg-emerald-500 text-black font-medium" : "text-slate-400 hover:text-white"
+                    }`}
                 >
                   {g}
                 </button>
@@ -221,7 +223,7 @@ export default function ActivityPage() {
           </div>
         </div>
 
-        <ResponsiveContainer width="100%" height={340}>
+        <ResponsiveContainer width="100%" height={380}>
           <AreaChart
             data={data}
             margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
@@ -229,10 +231,16 @@ export default function ActivityPage() {
             style={{ cursor: "pointer" }}
           >
             <defs>
-              <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+              <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
                 <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
               </linearGradient>
+              {top3Genres.map((genre, i) => (
+                <linearGradient key={genre} id={`colorGenre${i}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={GENRE_COLORS[i]} stopOpacity={0.2} />
+                  <stop offset="95%" stopColor={GENRE_COLORS[i]} stopOpacity={0} />
+                </linearGradient>
+              ))}
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
             <XAxis dataKey="date" tick={{ fill: "#94a3b8", fontSize: 11 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
@@ -240,17 +248,39 @@ export default function ActivityPage() {
             <Tooltip
               contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #1e293b", borderRadius: "12px", fontSize: "12px" }}
               labelStyle={{ color: "#e2e8f0" }}
-              itemStyle={{ color: "#10b981" }}
             />
+            <Legend
+              wrapperStyle={{ fontSize: "11px", paddingTop: "12px" }}
+              formatter={(value) => <span style={{ color: "#94a3b8" }}>{value}</span>}
+            />
+
             <Area
               type="monotone"
               dataKey="count"
+              name="Total"
               stroke="#10b981"
               strokeWidth={2}
-              fill="url(#colorCount)"
+              fill="url(#colorTotal)"
               dot={false}
-              activeDot={{ r: 5, fill: "#10b981", cursor: "pointer" }}
+              activeDot={{ r: 4, fill: "#10b981" }}
             />
+
+            {/* Top 3 genres — dotted, faded */}
+            {top3Genres.map((genre, i) => (
+              <Area
+                key={genre}
+                type="monotone"
+                dataKey={genre}
+                name={genre}
+                stroke={GENRE_COLORS[i]}
+                strokeWidth={1.5}
+                strokeOpacity={0.4}
+                strokeDasharray="4 4"
+                fill="none"
+                dot={false}
+                activeDot={{ r: 3, fill: GENRE_COLORS[i] }}
+              />
+            ))}
           </AreaChart>
         </ResponsiveContainer>
       </div>
