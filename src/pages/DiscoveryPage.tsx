@@ -25,8 +25,8 @@ export default function DiscoveryPage() {
       .filter((t) => t.releaseDate && t.addedAt)
       .map((t) => {
         const releaseYear = Number(t.releaseDate.slice(0, 4));
-        const addedYear   = Number(t.addedAt.slice(0, 4));
-        const ageAtAdd    = addedYear - releaseYear;
+        const addedYear = Number(t.addedAt.slice(0, 4));
+        const ageAtAdd = addedYear - releaseYear;
         return { ...t, releaseYear, addedYear, ageAtAdd };
       })
       .filter((t) => !isNaN(t.ageAtAdd));
@@ -36,9 +36,12 @@ export default function DiscoveryPage() {
     enriched.reduce((sum, t) => sum + t.ageAtAdd, 0) / (enriched.length || 1)
   );
 
-  const immediate   = enriched.filter((t) => t.ageAtAdd <= 0);
-  const lateDisc    = enriched.filter((t) => t.ageAtAdd >= 5).sort((a, b) => b.ageAtAdd - a.ageAtAdd);
-  const top10Late   = lateDisc.slice(0, 10);
+  const immediate = enriched.filter((t) => t.ageAtAdd <= 0);
+  const lateDisc = enriched.filter((t) => t.ageAtAdd >= 5).sort((a, b) => b.ageAtAdd - a.ageAtAdd);
+  const top10Late = lateDisc.slice(0, 10);
+  const top10recent = [...enriched]
+    .sort((a, b) => b.releaseYear - a.releaseYear)
+    .slice(0, 10);
 
   const scatterData = enriched.map((t) => ({
     x: t.releaseYear,
@@ -50,9 +53,9 @@ export default function DiscoveryPage() {
 
   // Color by age gap
   function dotColor(age: number): string {
-    if (age <= 0)  return "#10b981"; // just released
-    if (age <= 2)  return "#3b82f6"; // recent
-    if (age <= 5)  return "#f59e0b"; // moderate
+    if (age <= 0) return "#10b981"; // just released
+    if (age <= 2) return "#3b82f6"; // recent
+    if (age <= 5) return "#f59e0b"; // moderate
     return "#ef4444";                // late discovery
   }
 
@@ -133,19 +136,59 @@ export default function DiscoveryPage() {
       {/* Late discoveries table */}
       <div className="rounded-3xl border border-slate-800 bg-slate-900 overflow-hidden">
         <div className="px-6 py-4 font-semibold border-b border-slate-800">⏳ Top Late Discoveries</div>
-        <table className="w-full text-left text-sm">
+        <table className="w-full table-fixed text-left text-sm">
           <thead className="bg-slate-950 text-slate-400">
             <tr>
-              <th className="p-4">#</th>
-              <th className="p-4">Title</th>
-              <th className="p-4">Artist</th>
-              <th className="p-4">Released</th>
-              <th className="p-4">Added</th>
-              <th className="p-4">Gap</th>
+              <th className="w-12 p-4">#</th>
+              <th className="w-[40%] p-4">Title</th>
+              <th className="w-[30%] p-4">Artist</th>
+              <th className="w-24 p-4">Released</th>
+              <th className="w-24 p-4">Added</th>
+              <th className="w-20 p-4">Gap</th>
             </tr>
           </thead>
           <tbody>
             {top10Late.map((t, i) => (
+              <tr key={`${t.artist}-${t.title}`} className="border-t border-slate-800 hover:bg-slate-800/50">
+                <td className="p-4 text-slate-500 tabular-nums">{i + 1}</td>
+                <td className="p-4">
+                  <a
+                    href={t.spotifyURL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-medium text-emerald-400 transition hover:text-emerald-300 hover:underline"
+                  >
+                    {t.title}
+                  </a>
+                </td>
+                <td className="p-4">{t.artist}</td>
+                <td className="p-4 text-slate-400">{t.releaseYear}</td>
+                <td className="p-4 text-slate-400">{t.addedYear}</td>
+                <td className="p-4">
+                  <span className="rounded-full bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-400">
+                    +{t.ageAtAdd}y
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="rounded-3xl border border-slate-800 bg-slate-900 overflow-hidden">
+        <div className="px-6 py-4 font-semibold border-b border-slate-800">🆕 Top Most Recent Discoveries</div>
+        <table className="w-full table-fixed text-left text-sm">
+          <thead className="bg-slate-950 text-slate-400">
+            <tr>
+              <th className="w-12 p-4">#</th>
+              <th className="w-[40%] p-4">Title</th>
+              <th className="w-[30%] p-4">Artist</th>
+              <th className="w-24 p-4">Released</th>
+              <th className="w-24 p-4">Added</th>
+              <th className="w-20 p-4">Gap</th>
+            </tr>
+          </thead>
+          <tbody>
+            {top10recent.map((t, i) => (
               <tr key={`${t.artist}-${t.title}`} className="border-t border-slate-800 hover:bg-slate-800/50">
                 <td className="p-4 text-slate-500 tabular-nums">{i + 1}</td>
                 <td className="p-4">
