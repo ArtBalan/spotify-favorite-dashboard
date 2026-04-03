@@ -13,17 +13,19 @@ A small dashboard that visualizes your favorite Spotify tracks, artists, and lis
     - [Years Page](#years-page)
     - [Per Years Page](#per-years-page)
     - [Activity Page](#activity-page)
+    - [Discovery Page](#discovery-page)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Create Spotify API Credentials](#create-spotify-api-credentials)
   - [Environment Variables](#environment-variables)
   - [Fetch Your Spotify Data](#fetch-your-spotify-data)
+  - [A variable called `FETCH_PLAYLIST` can be set to true if you want the script to fetch all your playlist and not juste the liked one.](#a-variable-called-fetch_playlist-can-be-set-to-true-if-you-want-the-script-to-fetch-all-your-playlist-and-not-juste-the-liked-one)
   - [Run the App](#run-the-app)
 
 
 ## Disclaimer
 
-This project was "vibe coded" as a crash test for Claude AI, with only small human intervention.
+This project was "vibe coded" as a crash test for Claude AI (and a bit of chatGPT), with only small human intervention.
 
 The goal was to quickly explore how far an AI-assisted workflow could go when building a complete application with minimal manual planning. Some parts of the codebase may be experimental, inconsistent, or not production-ready.
 
@@ -33,7 +35,7 @@ This app exists primarily as a fun experiment and proof of concept.
 
 ### Overview Page
 
-The `OverviewPage` component displays a quick summary of the music dataset.
+The `OverviewPage` displays a quick summary of the music dataset.
 The page includes:
 * Total number of songs
 * Number of unique artists
@@ -43,7 +45,7 @@ The page includes:
 
 ### Artists Page
 
-The `ArtistsPage` component shows the most-played artists from the track dataset.
+The `ArtistsPage` shows the most-played artists from the track dataset.
 
 The table can be sorted by:
 * Rank
@@ -56,7 +58,7 @@ The page uses a two-column layout: the artist list on the left and the selected 
 
 ### Genres Page
 
-The `GenresPage` component displays statistics for each music genre in the dataset.
+The `GenresPage` displays statistics for each music genre in the dataset.
 
 The table can be sorted by:
 * Genre name
@@ -73,7 +75,7 @@ The page uses a two-column layout with the genre list on the left and the select
 
 ### Popularity Page
 
-The `PopularityPage` component analyzes songs based on their Spotify popularity score.
+The `PopularityPage` analyzes songs based on their Spotify popularity score.
 
 It loads all tracks and groups them into four popularity categories:
 * Hits (80+)
@@ -89,7 +91,7 @@ The page also highlights:
 
 ### Duration Page
 
-The `DurationPage` component analyzes the length of songs in the dataset.
+The `DurationPage` analyzes the length of songs in the dataset.
 
 The page displays:
 * Average song length
@@ -107,7 +109,7 @@ It also groups songs into duration ranges:
 
 ### Years Page
 
-The `YearsPage` component analyzes the release years of songs in the dataset.
+The `YearsPage` analyzes the release years of songs in the dataset.
 
 It loads all tracks, extracts the release year from each song, and counts how many songs were released each year.
 
@@ -122,7 +124,7 @@ All release years are visualized in a bar chart, showing how many liked songs co
 
 ### Per Years Page
 
-The `PerYearsPage` component displays song statistics grouped by release year.
+The `PerYearsPage` displays song statistics grouped by release year.
 
 It loads all tracks with, calculates yearly totals, and displays them in a sortable table.
 
@@ -138,7 +140,7 @@ Clicking a year selects it and displays all songs released in that year using th
 
 ### Activity Page
 
-The `ActivityPage` component tracks when songs were added to the dataset over time.
+The `ActivityPage` tracks when songs were added to the dataset over time.
 
 It loads all tracks and groups them by day, month, or year. Users can switch between these time ranges and filter for a specific date.
 
@@ -153,6 +155,20 @@ An area chart visualizes song activity over time, along with the top 3 most comm
 
 Clicking a point on the chart opens a modal showing all songs added during that period, including their artist, genre, popularity, and Spotify link.
 
+### Discovery Page
+
+The `DiscoveryPage` compares when songs were released to when they were added to your library.
+
+It loads track data and calculates how many years passed between each song’s release date and the date it was added.
+
+The page highlights:
+* Average age of songs when added
+* Songs added immediately after release
+* Songs discovered 5 or more years later
+
+A scatter chart visualizes release year versus added year, with colors showing how long it took to discover each song.
+
+The page also includes a table of the 10 biggest late discoveries, with direct Spotify links for each track.
 
 ## Prerequisites
 
@@ -226,6 +242,7 @@ npx ts-node src/scripts/fetchSpotify.ts
 This script uses your Spotify credentials to fetch the data required by the dashboard.
 A authentification link will be prompted, clic on it to allow the api to work properly.
 
+A variable called `FETCH_PLAYLIST` can be set to true if you want the script to fetch all your playlist and not juste the liked one.
 ---
 
 ## Run the App

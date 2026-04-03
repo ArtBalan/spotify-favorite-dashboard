@@ -33,7 +33,7 @@ function waitForCode(): Promise<string> {
       const parsed = url.parse(req.url || "", true);
       if (parsed.pathname === "/callback" && parsed.query.code) {
         res.writeHead(200, { "Content-Type": "text/html" });
-        res.end("<h1>✅ Done! You can close this tab.</h1>");
+        res.end("<h1>All Done! You can close this tab.</h1>");
         server.close();
         resolve(parsed.query.code as string);
       } else { res.writeHead(400); res.end("Bad request"); reject(new Error("No code")); }

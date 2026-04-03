@@ -144,3 +144,4 @@ vite.config.ts.timestamp-*
 .vite/
 
 src/data/liked_songs_by_genre.csv
+src/data/liked_songs_by_genre2.csv
