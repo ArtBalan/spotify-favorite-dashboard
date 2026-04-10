@@ -14,6 +14,7 @@ import ActivityPage from "./pages/ActivityPage";
 import AlbumsPage from "./pages/AlbumPage";
 import ExplicitPage from "./pages/ExplicitPage";
 import DiscoveryPage from "./pages/DiscoveryPage";
+import FavoritesPage from "./pages/FavoritesPage";
 export default function App() {
 
 
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/albums" element={<AlbumsPage />} />
           <Route path="/explicit" element={<ExplicitPage />} />
           <Route path="/discovery" element={<DiscoveryPage />} />
+          <Route path="/favorites" element={<FavoritesPage />} />
         </Routes>
       </Layout>
     </BrowserRouter>

@@ -12,6 +12,7 @@ const links = [
   ["/albums", "Albums"],
   ["/explicit", "Explicit"],
   ["/discovery", "Discovery"],
+  ["/favorites", "Favorites"],
 ];
 
 export default function Topbar() {
