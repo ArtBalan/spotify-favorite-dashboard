@@ -15,6 +15,7 @@ import AlbumsPage from "./pages/AlbumPage";
 import ExplicitPage from "./pages/ExplicitPage";
 import DiscoveryPage from "./pages/DiscoveryPage";
 import FavoritesPage from "./pages/FavoritesPage";
+import DecadesPage from "./pages/DecadesPage";
 export default function App() {
 
 
@@ -35,6 +36,7 @@ export default function App() {
           <Route path="/explicit" element={<ExplicitPage />} />
           <Route path="/discovery" element={<DiscoveryPage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
+          <Route path="/decades" element={<DecadesPage />} />
         </Routes>
       </Layout>
     </BrowserRouter>

@@ -16,7 +16,6 @@ export function getLongestStreak(tracks: Track[], unit: "day" | "week"): {
       .map((t) => {
         const [datePart] = t.addedAt.split("T");
         if (unit === "day") return datePart;
-        // ISO week key: "2023-W14"
         const [year, month, day] = datePart.split("-").map(Number);
         const d = new Date(year, month - 1, day);
         const dayOfWeek = d.getDay() === 0 ? 7 : d.getDay();
@@ -75,7 +74,7 @@ export function getCurrentStreak(tracks: Track[], unit: "day" | "week"): {
     tracks
       .filter((t) => t.addedAt)
       .map((t) => toUnitKey(t.addedAt.split("T")[0]))
-  )].sort().reverse(); // most recent first
+  )].sort().reverse();
 
   if (dates.length === 0 || dates[0] !== todayKey) return { streak: 0, from: "" };
 
@@ -127,18 +126,18 @@ export function getTopArtists(tracks: Track[]) {
     .sort((a, b) => b.count - a.count);
 }
 
-export function getTopYears(tracks: Track[]){
+export function getTopYears(tracks: Track[]) {
   const counts = new Map<string, number>();
 
   tracks.forEach((track) => {
-    counts.set(track.releaseDate.split('-')[0], (counts.get(track.releaseDate.split('-')[0]) || 0) + 1);
+    counts.set(track.releaseDate.split("-")[0], (counts.get(track.releaseDate.split("-")[0]) || 0) + 1);
   });
 
   return [...counts.entries()]
     .map(([year, count]) => ({ year, count }))
     .sort((a, b) => b.count - a.count || parseInt(b.year) - parseInt(a.year))
     .sort((a, b) => b.count - a.count)
-    .map((g, index) => ({ ...g, rank: index + 1 }));;
+    .map((g, index) => ({ ...g, rank: index + 1 }));
 }
 
 export function getGenres(tracks: Track[]) {
@@ -175,4 +174,94 @@ export function getGenres(tracks: Track[]) {
     }))
     .sort((a, b) => b.count - a.count)
     .map((g, index) => ({ ...g, rank: index + 1 }));
+}
+
+// ── NEW: Decades ────────────────────────────────────────────────────────────
+
+export interface DecadeStat {
+  decade: string;        // e.g. "1980s"
+  decadeStart: number;   // e.g. 1980
+  count: number;
+  share: number;         // 0-100
+  avgPopularity: number;
+  topArtists: { artist: string; count: number }[];
+  topTracks: { title: string; artist: string; popularity: number; spotifyURL: string }[];
+}
+
+export function getDecades(tracks: Track[]): DecadeStat[] {
+  const map = new Map<number, Track[]>();
+
+  tracks.forEach((t) => {
+    const year = parseInt(t.releaseDate.split("-")[0]);
+    if (isNaN(year)) return;
+    const decade = Math.floor(year / 10) * 10;
+    if (!map.has(decade)) map.set(decade, []);
+    map.get(decade)!.push(t);
+  });
+
+  const total = tracks.length;
+
+  return [...map.entries()]
+    .sort((a, b) => b[0] - a[0])
+    .map(([decadeStart, ts]) => {
+      const artistCounts = new Map<string, number>();
+      ts.forEach((t) => artistCounts.set(t.artist, (artistCounts.get(t.artist) ?? 0) + 1));
+      const topArtists = [...artistCounts.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([artist, count]) => ({ artist, count }));
+
+      const topTracks = [...ts]
+        .sort((a, b) => b.popularity - a.popularity)
+        .slice(0, 3)
+        .map((t) => ({ title: t.title, artist: t.artist, popularity: t.popularity, spotifyURL: t.spotifyURL }));
+
+      const avgPopularity =
+        ts.reduce((sum, t) => sum + t.popularity, 0) / ts.length;
+
+      return {
+        decade: `${decadeStart}s`,
+        decadeStart,
+        count: ts.length,
+        share: (ts.length / total) * 100,
+        avgPopularity,
+        topArtists,
+        topTracks,
+      };
+    });
+}
+
+// ── NEW: Artist sparkline ────────────────────────────────────────────────────
+
+/** Returns monthly add counts for a given artist, sorted chronologically. */
+export function getArtistSparkline(
+  tracks: Track[],
+  artist: string
+): { month: string; count: number }[] {
+  const map = new Map<string, number>();
+
+  tracks
+    .filter((t) => t.artist === artist && t.addedAt)
+    .forEach((t) => {
+      const month = t.addedAt.slice(0, 7); // "YYYY-MM"
+      map.set(month, (map.get(month) ?? 0) + 1);
+    });
+
+  if (map.size === 0) return [];
+
+  // Fill in missing months between first and last
+  const keys = [...map.keys()].sort();
+  const [firstYear, firstMonth] = keys[0].split("-").map(Number);
+  const [lastYear, lastMonth] = keys[keys.length - 1].split("-").map(Number);
+
+  const result: { month: string; count: number }[] = [];
+  let y = firstYear, m = firstMonth;
+  while (y < lastYear || (y === lastYear && m <= lastMonth)) {
+    const key = `${y}-${String(m).padStart(2, "0")}`;
+    result.push({ month: key, count: map.get(key) ?? 0 });
+    m++;
+    if (m > 12) { m = 1; y++; }
+  }
+
+  return result;
 }

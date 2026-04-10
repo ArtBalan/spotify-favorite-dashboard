@@ -36,6 +36,7 @@ const nav: NavItem[] = [
       ["/activity", "Activity"],
       ["/years",    "Years"],
       ["/perYears", "Per Years"],
+      ["/decades",  "Decades"],
     ],
   },
 ];
