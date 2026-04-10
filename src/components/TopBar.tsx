@@ -8,7 +8,6 @@ type NavItem =
   | { type: "dropdown"; label: string; links: LinkDef[] };
 
 const nav: NavItem[] = [
-  { type: "link", to: "/", label: "Overview" },
   {
     type: "dropdown",
     label: "Library",
@@ -104,7 +103,12 @@ export default function Topbar() {
   return (
     <header className="border-b border-slate-800 bg-slate-950 px-6 py-3">
       <div className="flex items-center gap-6">
-        <span className="text-xl font-bold shrink-0">🎵 Dashboard</span>
+        <NavLink
+          to="/"
+          className="text-xl font-bold shrink-0 transition hover:text-emerald-400"
+        >
+          🎵 Dashboard
+        </NavLink>
 
         <nav className="flex items-center gap-1">
           {nav.map((item) =>

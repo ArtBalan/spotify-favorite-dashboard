@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 
-import OverviewPage from "./pages/OverviewPage";
+import HomePage from "./pages/HomePage";
+
 import ArtistsPage from "./pages/ArtistsPage";
 import GenresPage from "./pages/GenresPage";
 import PopularityPage from "./pages/PopularityPage";
@@ -16,27 +17,26 @@ import ExplicitPage from "./pages/ExplicitPage";
 import DiscoveryPage from "./pages/DiscoveryPage";
 import FavoritesPage from "./pages/FavoritesPage";
 import DecadesPage from "./pages/DecadesPage";
+
 export default function App() {
-
-
   if (!hasData()) return <MissingData />;
   return (
     <BrowserRouter>
       <Layout>
         <Routes>
-          <Route path="/" element={<OverviewPage />} />
-          <Route path="/artists" element={<ArtistsPage />} />
-          <Route path="/genres" element={<GenresPage />} />
+          <Route path="/"           element={<HomePage />} />
+          <Route path="/artists"    element={<ArtistsPage />} />
+          <Route path="/genres"     element={<GenresPage />} />
           <Route path="/popularity" element={<PopularityPage />} />
-          <Route path="/duration" element={<DurationPage />} />
-          <Route path="/years" element={<YearsPage />} />
-          <Route path="/perYears" element={<PerYearsPage/>} />
-          <Route path="/activity" element={<ActivityPage />} />
-          <Route path="/albums" element={<AlbumsPage />} />
-          <Route path="/explicit" element={<ExplicitPage />} />
-          <Route path="/discovery" element={<DiscoveryPage />} />
-          <Route path="/favorites" element={<FavoritesPage />} />
-          <Route path="/decades" element={<DecadesPage />} />
+          <Route path="/duration"   element={<DurationPage />} />
+          <Route path="/years"      element={<YearsPage />} />
+          <Route path="/perYears"   element={<PerYearsPage />} />
+          <Route path="/activity"   element={<ActivityPage />} />
+          <Route path="/albums"     element={<AlbumsPage />} />
+          <Route path="/explicit"   element={<ExplicitPage />} />
+          <Route path="/discovery"  element={<DiscoveryPage />} />
+          <Route path="/favorites"  element={<FavoritesPage />} />
+          <Route path="/decades"    element={<DecadesPage />} />
         </Routes>
       </Layout>
     </BrowserRouter>
