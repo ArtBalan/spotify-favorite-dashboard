@@ -25,6 +25,7 @@ export default function ArtistsPage() {
   const [selectedArtist, setSelectedArtist] = useState(artists[0]?.artist || "");
   const [sortKey, setSortKey] = useState<SortKey>("rank");
   const [direction, setDirection] = useState<"asc" | "desc">("asc");
+  const [query, setQuery] = useState("");
 
   function sortBy(key: SortKey) {
     if (sortKey === key) {
@@ -42,6 +43,12 @@ export default function ArtistsPage() {
       return (a[sortKey] - b[sortKey]) * modifier;
     });
   }, [artists, sortKey, direction]);
+
+  const filteredArtists = useMemo(() => {
+    const q = query.toLowerCase().trim();
+    if (!q) return sortedArtists;
+    return sortedArtists.filter((a) => a.artist.toLowerCase().includes(q));
+  }, [sortedArtists, query]);
 
   const artistTracks = useMemo(
     () => tracks.filter((t) => t.artist === selectedArtist),
@@ -65,34 +72,43 @@ export default function ArtistsPage() {
       <h1 className="mb-6 text-4xl font-bold">Artists</h1>
 
       <div className="grid gap-6 lg:grid-cols-[435px_1fr]">
-        <div className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900">
-          <table className=" text-left text-sm">
-            <thead className="bg-slate-950 text-slate-400">
-              <tr>
-                {col("rank", "#")}
-                {col("artist", "Artist")}
-                {col("count", "Songs")}
-              </tr>
-            </thead>
+        <div className="flex flex-col gap-3">
+          <input
+            type="text"
+            placeholder="Search artists…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm text-slate-200 placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+          />
+          <div className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900">
+            <table className=" text-left text-sm">
+              <thead className="bg-slate-950 text-slate-400">
+                <tr>
+                  {col("rank", "#")}
+                  {col("artist", "Artist")}
+                  {col("count", "Songs")}
+                </tr>
+              </thead>
 
-            <tbody>
-              {sortedArtists.map((artist) => {
-                return (
-                  <tr
-                    key={artist.artist}
-                    onClick={() => setSelectedArtist(artist.artist)}
-                    className={`cursor-pointer border-t border-slate-800 transition hover:bg-slate-800 ${
-                      selectedArtist === artist.artist ? "bg-slate-800" : ""
-                    }`}
-                  >
-                    <td className="p-4 text-slate-500 tabular-nums">{artist.rank}</td>
-                    <td className="p-4 font-medium">{artist.artist}</td>
-                    <td className="p-4">{artist.count}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+              <tbody>
+                {filteredArtists.map((artist) => {
+                  return (
+                    <tr
+                      key={artist.artist}
+                      onClick={() => setSelectedArtist(artist.artist)}
+                      className={`cursor-pointer border-t border-slate-800 transition hover:bg-slate-800 ${
+                        selectedArtist === artist.artist ? "bg-slate-800" : ""
+                      }`}
+                    >
+                      <td className="p-4 text-slate-500 tabular-nums">{artist.rank}</td>
+                      <td className="p-4 font-medium">{artist.artist}</td>
+                      <td className="p-4">{artist.count}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div>

@@ -26,6 +26,7 @@ export default function GenresPage() {
   const [selectedGenre, setSelectedGenre] = useState(genres[0]?.genre || "");
   const [sortKey, setSortKey] = useState<SortKey>("count");
   const [direction, setDirection] = useState<"asc" | "desc">("desc");
+  const [query, setQuery] = useState("");
 
   function sortBy(key: SortKey) {
     if (sortKey === key) {
@@ -40,11 +41,16 @@ export default function GenresPage() {
     const modifier = direction === "asc" ? 1 : -1;
     return [...genres].sort((a, b) => {
       if (sortKey === "genre") return a.genre.localeCompare(b.genre) * modifier;
-      // "share" sorts the same as "count" since share ∝ count
       if (sortKey === "share") return (a.count - b.count) * modifier;
       return (a[sortKey] - b[sortKey]) * modifier;
     });
   }, [genres, sortKey, direction]);
+
+  const filteredGenres = useMemo(() => {
+    const q = query.toLowerCase().trim();
+    if (!q) return sortedGenres;
+    return sortedGenres.filter((g) => g.genre.toLowerCase().includes(q));
+  }, [sortedGenres, query]);
 
   const genreTracks = tracks.filter((t) => t.genre === selectedGenre);
 
@@ -65,51 +71,60 @@ export default function GenresPage() {
       <h1 className="mb-6 text-4xl font-bold">Genres</h1>
 
       <div className="grid gap-6 lg:grid-cols-[580px_1fr]">
-        <div className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-950 text-slate-400">
-              <tr>
-                <th className="p-4 text-slate-600">#</th>  {/* ← add */}
-                {col("genre", "Genre")}
-                {col("count", "Songs")}
-                {col("share", "Share")}
-                {col("avgPopularity", "Popularity")}
-                {col("explicitRate", "Explicit %")}
-              </tr>
-            </thead>
+        <div className="flex flex-col gap-3">
+          <input
+            type="text"
+            placeholder="Search genres…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm text-slate-200 placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+          />
+          <div className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-slate-950 text-slate-400">
+                <tr>
+                  <th className="p-4 text-slate-600">#</th>
+                  {col("genre", "Genre")}
+                  {col("count", "Songs")}
+                  {col("share", "Share")}
+                  {col("avgPopularity", "Popularity")}
+                  {col("explicitRate", "Explicit %")}
+                </tr>
+              </thead>
 
-            <tbody>
-              {sortedGenres.map((genre) => {
-                const share = (genre.count / total) * 100;
-                return (
-                  <tr
-                    key={genre.genre}
-                    onClick={() => setSelectedGenre(genre.genre)}
-                    className={`cursor-pointer border-t border-slate-800 transition hover:bg-slate-800 ${
-                      selectedGenre === genre.genre ? "bg-slate-800" : ""
-                    }`}
-                  >
-                    <td className="p-4 text-slate-500 tabular-nums">{genre.rank}</td>
-                    <td className="p-4">{genre.genre}</td>
-                    <td className="p-4">{genre.count}</td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-2">
-                        <div className="h-1.5 w-20 overflow-hidden rounded-full bg-slate-700">
-                          <div
-                            className="h-full rounded-full bg-emerald-500"
-                            style={{ width: `${share}%` }}
-                          />
+              <tbody>
+                {filteredGenres.map((genre) => {
+                  const share = (genre.count / total) * 100;
+                  return (
+                    <tr
+                      key={genre.genre}
+                      onClick={() => setSelectedGenre(genre.genre)}
+                      className={`cursor-pointer border-t border-slate-800 transition hover:bg-slate-800 ${
+                        selectedGenre === genre.genre ? "bg-slate-800" : ""
+                      }`}
+                    >
+                      <td className="p-4 text-slate-500 tabular-nums">{genre.rank}</td>
+                      <td className="p-4">{genre.genre}</td>
+                      <td className="p-4">{genre.count}</td>
+                      <td className="p-4">
+                        <div className="flex items-center gap-2">
+                          <div className="h-1.5 w-20 overflow-hidden rounded-full bg-slate-700">
+                            <div
+                              className="h-full rounded-full bg-emerald-500"
+                              style={{ width: `${share}%` }}
+                            />
+                          </div>
+                          <span className="text-slate-400">{share.toFixed(1)}%</span>
                         </div>
-                        <span className="text-slate-400">{share.toFixed(1)}%</span>
-                      </div>
-                    </td>
-                    <td className="p-4">{genre.avgPopularity.toFixed(1)}</td>
-                    <td className="p-4">{genre.explicitRate.toFixed(0)}%</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      </td>
+                      <td className="p-4">{genre.avgPopularity.toFixed(1)}</td>
+                      <td className="p-4">{genre.explicitRate.toFixed(0)}%</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div>
