@@ -4,15 +4,16 @@ import { loadTracks } from "../lib/parseCsv";
 import SongsTable from "../components/SongsTable";
 
 export default function DecadesPage() {
-  const tracks = loadTracks();
-  const decades = useMemo(() => getDecades(tracks), []);
+  const tracks = useMemo(() => loadTracks(), []);
+  const decades = useMemo(() => getDecades(tracks), [tracks]);
   const [selectedDecade, setSelectedDecade] = useState(decades[0]?.decadeStart ?? 0);
 
   const decadeTracks = useMemo(
-    () => tracks.filter((t) => {
-      const year = parseInt(t.releaseDate.split("-")[0]);
-      return Math.floor(year / 10) * 10 === selectedDecade;
-    }),
+    () =>
+      tracks.filter((t) => {
+        const year = parseInt(t.releaseDate.split("-")[0]);
+        return Math.floor(year / 10) * 10 === selectedDecade;
+      }),
     [tracks, selectedDecade]
   );
 
@@ -120,7 +121,7 @@ export default function DecadesPage() {
             </div>
 
             {/* All songs in decade */}
-            <SongsTable tracks={decadeTracks} />
+            <SongsTable key={selectedDecade} tracks={decadeTracks} />
           </div>
         )}
       </div>
